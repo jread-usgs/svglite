@@ -381,20 +381,6 @@ BEGIN_RCPP
   svgd->clipx1 = dd->right;
   svgd->clipy1 = 0;
 
-  // Setting default styles
-  (*stream) << "<defs>\n";
-  (*stream) << "  <style type='text/css'><![CDATA[\n";
-  (*stream) << "    line, polyline, polygon, path, rect, circle {\n";
-  (*stream) << "      fill: none;\n";
-  (*stream) << "      stroke: #000000;\n";
-  (*stream) << "      stroke-linecap: round;\n";
-  (*stream) << "      stroke-linejoin: round;\n";
-  (*stream) << "      stroke-miterlimit: 10.00;\n";
-  (*stream) << "    }\n";
-  (*stream) << "  ]]></style>\n";
-  (*stream) << "</defs>\n";
-
-  (*stream) << "<rect width='100%' height='100%'";
   write_style_begin(stream);
   write_style_str(stream, "stroke", "none", true);
   if (is_filled(gc->fill))
