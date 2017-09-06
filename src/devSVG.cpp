@@ -377,6 +377,12 @@ void svg_line(double x1, double y1, double x2, double y2,
   (*stream) << "<line x1='" << x1 << "' y1='" << y1 << "' x2='" <<
     x2 << "' y2='" << y2 << '\'';
 
+  write_style_begin(stream);
+  write_style_linetype(stream, gc, true);
+  write_style_end(stream);
+
+  write_attr_clip(stream, svgd->clipid);
+
   (*stream) << " />\n";
   stream->flush();
 }
@@ -393,6 +399,14 @@ void svg_poly(int n, double *x, double *y, int filled, const pGEcontext gc,
     (*stream) << x[i] << ',' << y[i] << ' ';
   }
   stream->put('\'');
+
+  write_style_begin(stream);
+  write_style_linetype(stream, gc, true);
+  if (filled)
+    write_style_col(stream, "fill", gc->fill);
+  write_style_end(stream);
+
+  write_attr_clip(stream, svgd->clipid);
 
   (*stream) << " />\n";
   stream->flush();
@@ -433,6 +447,16 @@ void svg_path(double *x, double *y,
   // Finish path data
   stream->put('\'');
 
+  write_style_begin(stream);
+  // Specify fill rule
+  write_style_str(stream, "fill-rule", winding ? "nonzero" : "evenodd", true);
+  if (is_filled(gc->fill))
+    write_style_col(stream, "fill", gc->fill);
+  write_style_linetype(stream, gc);
+  write_style_end(stream);
+
+  write_attr_clip(stream, svgd->clipid);
+
   (*stream) << " />\n";
   stream->flush();
 }
@@ -456,6 +480,14 @@ void svg_rect(double x0, double y0, double x1, double y1,
   // x and y give top-left position
   (*stream) << "<rect x='" << fmin(x0, x1) << "' y='" << fmin(y0, y1) <<
     "' width='" << fabs(x1 - x0) << "' height='" << fabs(y1 - y0) << '\'';
+
+  write_style_begin(stream);
+  write_style_linetype(stream, gc, true);
+  if (is_filled(gc->fill))
+    write_style_col(stream, "fill", gc->fill);
+  write_style_end(stream);
+
+  write_attr_clip(stream, svgd->clipid);
 
   (*stream) << " />\n";
   stream->flush();
