@@ -324,7 +324,32 @@ void svg_metric_info(int c, const pGEcontext gc, double* ascent,
 void svg_clip(double x0, double x1, double y0, double y1, pDevDesc dd) {
   SVGDesc *svgd = (SVGDesc*) dd->deviceSpecific;
   SvgStreamPtr stream = svgd->stream;
-  // do nothing
+
+  // Avoid duplication
+  if (std::abs(x0 - svgd->clipx0) < 0.01 &&
+      std::abs(x1 - svgd->clipx1) < 0.01 &&
+      std::abs(y0 - svgd->clipy0) < 0.01 &&
+      std::abs(y1 - svgd->clipy1) < 0.01)
+    return;
+
+  std::ostringstream s;
+  s << std::fixed << std::setprecision(2);
+  s << dbl_format(x0) << "|" << dbl_format(x1) << "|" <<
+       dbl_format(y0) << "|" << dbl_format(y1);
+  std::string clipid = gdtools::base64_string_encode(s.str());
+
+  svgd->clipid = clipid;
+  svgd->clipx0 = x0;
+  svgd->clipx1 = x1;
+  svgd->clipy0 = y0;
+  svgd->clipy1 = y1;
+
+  (*stream) << "<defs>\n";
+  (*stream) << "  <clipPath id='cp" << svgd->clipid << "'>\n";
+  (*stream) << "    <rect x='" << std::min(x0, x1) << "' y='" << std::min(y0, y1) <<
+    "' width='" << std::abs(x1 - x0) << "' height='" << std::abs(y1 - y0) << "' />\n";
+  (*stream) << "  </clipPath>\n";
+  (*stream) << "</defs>\n";
   stream->flush();
 }
 
@@ -344,7 +369,6 @@ BEGIN_RCPP
   (*stream) << "<svg";
   if (svgd->standalone){
     (*stream) << " xmlns='http://www.w3.org/2000/svg'";
-    (*stream) << " preserveAspectRatio='xMidYMid meet'";
     //http://www.w3.org/wiki/SVG_Links
     (*stream) << " xmlns:xlink='http://www.w3.org/1999/xlink'";
   }
