@@ -381,6 +381,15 @@ BEGIN_RCPP
   svgd->clipx1 = dd->right;
   svgd->clipy1 = 0;
 
+  write_style_begin(stream);
+  write_style_str(stream, "stroke", "none", true);
+  if (is_filled(gc->fill))
+    write_style_col(stream, "fill", gc->fill);
+  else
+    write_style_col(stream, "fill", dd->startfill);
+  write_style_end(stream);
+  (*stream) << "/>\n";
+
   svgd->stream->flush();
   svgd->pageno++;
 
@@ -523,6 +532,14 @@ void svg_circle(double x, double y, double r, const pGEcontext gc,
   SvgStreamPtr stream = svgd->stream;
 
   (*stream) << "<circle cx='" << x << "' cy='" << y << "' r='" << r << "pt'";
+
+  write_style_begin(stream);
+  write_style_linetype(stream, gc, true);
+  if (is_filled(gc->fill))
+    write_style_col(stream, "fill", gc->fill);
+  write_style_end(stream);
+
+  write_attr_clip(stream, svgd->clipid);
 
   (*stream) << " />\n";
   stream->flush();
