@@ -349,7 +349,7 @@ BEGIN_RCPP
     (*stream) << " xmlns:xlink='http://www.w3.org/1999/xlink'";
   }
 
-  (*stream) << " viewBox='0 0 " << dd->right << ' ' << dd->bottom << "'>\n";
+  (*stream) << " viewBox='0 0 " << dd->right << ' ' << dd->bottom << "'>\n<g>\n";
 
   // Initialise clipping the same way R does
   svgd->clipx0 = 0;
@@ -706,7 +706,7 @@ std::string get_svg_content(Rcpp::XPtr<std::stringstream> p) {
   // If the current SVG is empty, we also make the string empty
   // Otherwise append "</svg>" to make it a valid SVG
   if(!svgstr.empty()) {
-    svgstr.append("</svg>");
+    svgstr.append("</g>\n</svg>");
   }
   return svgstr;
 }
