@@ -61,13 +61,13 @@ public:
   // seeking back to original position. So we only write the newline
   // in finish()
   void flush() {
-    stream_ << "</svg>";
+    stream_ << "</g>\n</svg>";
     stream_.seekp(-6, std::ios_base::cur);
     stream_.flush();
   }
 
   void finish() {
-    stream_ << "</svg>\n";
+    stream_ << "</g>\n</svg>\n";
     stream_.flush();
   }
 
@@ -108,7 +108,7 @@ public:
     // If the current svg is empty, we also make the string empty
     // Otherwise append "</svg>" to make it a valid SVG
     if(!svgstr.empty()) {
-      svgstr.append("</svg>");
+      svgstr.append("</g>\n</svg>");
     }
     env_["svg_string"] = svgstr;
   }
