@@ -43,13 +43,13 @@ public:
   XPtrCairoContext cc;
 
   SVGDesc(SvgStreamPtr stream_, bool standalone_, Rcpp::List aliases_):
-      stream(stream_),
-      pageno(0),
-      clipx0(0), clipx1(0), clipy0(0), clipy1(0),
-      standalone(standalone_),
-      system_aliases(Rcpp::wrap(aliases_["system"])),
-      user_aliases(Rcpp::wrap(aliases_["user"])),
-      cc(gdtools::context_create()) {
+    stream(stream_),
+    pageno(0),
+    clipx0(0), clipx1(0), clipy0(0), clipy1(0),
+    standalone(standalone_),
+    system_aliases(Rcpp::wrap(aliases_["system"])),
+    user_aliases(Rcpp::wrap(aliases_["user"])),
+    cc(gdtools::context_create()) {
   }
 };
 
@@ -244,16 +244,16 @@ inline void write_style_linetype(SvgStreamPtr stream, const pGEcontext gc, bool 
     // For details
     // https://github.com/wch/r-source/blob/trunk/src/include/R_ext/GraphicsEngine.h#L337
     (*stream) << " stroke-dasharray: ";
-    // First number
-    (*stream) << scale_lty(lty, gc->lwd);
+  // First number
+  (*stream) << scale_lty(lty, gc->lwd);
+  lty = lty >> 4;
+  // Remaining numbers
+  for(int i = 1 ; i < 8 && lty & 15; i++) {
+    (*stream) << ',' << scale_lty(lty, gc->lwd);
     lty = lty >> 4;
-    // Remaining numbers
-    for(int i = 1 ; i < 8 && lty & 15; i++) {
-      (*stream) << ',' << scale_lty(lty, gc->lwd);
-      lty = lty >> 4;
-    }
-    stream->put(';');
-    break;
+  }
+  stream->put(';');
+  break;
   }
 
   // Set line end shape
@@ -335,7 +335,7 @@ void svg_clip(double x0, double x1, double y0, double y1, pDevDesc dd) {
   std::ostringstream s;
   s << std::fixed << std::setprecision(2);
   s << dbl_format(x0) << "|" << dbl_format(x1) << "|" <<
-       dbl_format(y0) << "|" << dbl_format(y1);
+    dbl_format(y0) << "|" << dbl_format(y1);
   std::string clipid = gdtools::base64_string_encode(s.str());
 
   svgd->clipid = clipid;
@@ -354,7 +354,7 @@ void svg_clip(double x0, double x1, double y0, double y1, pDevDesc dd) {
 }
 
 void svg_new_page(const pGEcontext gc, pDevDesc dd) {
-BEGIN_RCPP
+  BEGIN_RCPP
 
   SVGDesc *svgd = (SVGDesc*) dd->deviceSpecific;
   SvgStreamPtr stream = svgd->stream;
@@ -407,7 +407,7 @@ BEGIN_RCPP
   svgd->stream->flush();
   svgd->pageno++;
 
-VOID_END_RCPP
+  VOID_END_RCPP
 }
 
 void svg_close(pDevDesc dd) {
@@ -541,7 +541,7 @@ void svg_rect(double x0, double y0, double x1, double y1,
 }
 
 void svg_circle(double x, double y, double r, const pGEcontext gc,
-                       pDevDesc dd) {
+                pDevDesc dd) {
   SVGDesc *svgd = (SVGDesc*) dd->deviceSpecific;
   SvgStreamPtr stream = svgd->stream;
 
@@ -579,7 +579,7 @@ void svg_text(double x, double y, const char *str, double rot,
     write_attr_dbl(stream, "y", y);
   } else {
     (*stream) << tfm::format(" transform='translate(%0.2f,%0.2f) rotate(%0.0f)'",
-      x, y, -1.0 * rot);
+     x, y, -1.0 * rot);
   }
 
   double fontsize = gc->cex * gc->ps;
@@ -641,7 +641,7 @@ void svg_raster(unsigned int *raster, int w, int h,
   }
 
   std::string base64_str = gdtools::raster_to_str(raster_, w, h, width, height,
-    (Rboolean) interpolate);
+                                                  (Rboolean) interpolate);
 
   // If we specify the clip path inside <image>, the "transform" also
   // affects the clip path, so we need to specify clip path at an outer level
